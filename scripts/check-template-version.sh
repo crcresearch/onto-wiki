@@ -42,7 +42,8 @@ TEMPLATE_SHA=$(git rev-parse --short template/main)
 # Same file list logic as update-from-template.sh (kept duplicated rather
 # than sourced so each script remains standalone).
 ALWAYS_FILES=(
-    "llm-wiki.md" "wiki/init-wiki.sh" "wiki/agents/README.md"
+    # wiki/init-wiki.sh DIVERGED — see .llm-wiki-template-log.md
+    "llm-wiki.md" "wiki/agents/README.md"
     "wiki/agents/discipline-gates.md" "wiki/agents/verification-gate.md"
     "wiki/agents/wiki-write-protocol.md"
     "scripts/update-from-template.sh" "scripts/check-template-version.sh"
@@ -74,13 +75,10 @@ ONE_SHOT_FILES=(
     ".cursorrules.template"
 )
 CLAUDE_FILES=(
-    ".claude/commands/wiki-experiment.md" ".claude/commands/wiki-source.md"
-    ".claude/commands/wiki-lint.md" ".claude/skills/wiki-experiment.md"
-    ".claude/skills/wiki-source.md" ".claude/skills/wiki-lint.md"
+    # DIVERGED operating-layer files dropped (see .llm-wiki-template-log.md):
+    #   .claude/{commands,skills}/wiki-{experiment,source,lint}.md
+    #   wiki/agents/claude-code/templates/{claude-md-snippet,memory-seed,session-start-hook}
     "wiki/agents/claude-code/setup.sh" "wiki/agents/claude-code/README.md"
-    "wiki/agents/claude-code/templates/claude-md-snippet.md"
-    "wiki/agents/claude-code/templates/memory-seed.md"
-    "wiki/agents/claude-code/templates/session-start-hook.sh"
 )
 CURSOR_FILES=(
     ".cursor/rules/wiki-as-memory.mdc" ".cursor/rules/wiki-experiment.mdc"
