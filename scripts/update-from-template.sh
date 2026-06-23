@@ -91,7 +91,7 @@ echo "Template HEAD: $TEMPLATE_SHA"
 # --- Build the file list ---
 ALWAYS_FILES=(
     "llm-wiki.md"
-    "wiki/init-wiki.sh"
+    # wiki/init-wiki.sh — DIVERGED (authors thin SCHEMA + memory-architecture.md); see .llm-wiki-template-log.md
     "wiki/agents/README.md"
     "wiki/agents/discipline-gates.md"
     "wiki/agents/verification-gate.md"
@@ -132,17 +132,14 @@ ONE_SHOT_FILES=(
 )
 
 CLAUDE_FILES=(
-    ".claude/commands/wiki-experiment.md"
-    ".claude/commands/wiki-source.md"
-    ".claude/commands/wiki-lint.md"
-    ".claude/skills/wiki-experiment.md"
-    ".claude/skills/wiki-source.md"
-    ".claude/skills/wiki-lint.md"
+    # DIVERGED operating-layer files dropped from sync (repointed to
+    # wiki/agents/memory-architecture.md; source-first pipeline). Restore to
+    # this list only after upstreaming. See .llm-wiki-template-log.md:
+    #   .claude/commands/wiki-{experiment,source,lint}.md
+    #   .claude/skills/wiki-{experiment,source,lint}.md
+    #   wiki/agents/claude-code/templates/{claude-md-snippet,memory-seed,session-start-hook}.md|.sh
     "wiki/agents/claude-code/setup.sh"
     "wiki/agents/claude-code/README.md"
-    "wiki/agents/claude-code/templates/claude-md-snippet.md"
-    "wiki/agents/claude-code/templates/memory-seed.md"
-    "wiki/agents/claude-code/templates/session-start-hook.sh"
 )
 
 CURSOR_FILES=(

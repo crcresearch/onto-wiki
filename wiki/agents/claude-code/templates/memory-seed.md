@@ -25,7 +25,7 @@ If something happens in our work that a future session would need to know, write
 - A finding contradicts or supersedes a wiki claim → update the affected pages, don't leave the contradiction.
 - Periodic health check → orphans, dead links, stale claims, missing frontmatter. (Skill: `/wiki-lint`.)
 
-For every write: frontmatter (`type:`, `up:`, typed edges like `extends:` / `supports:` / `criticizes:` when the relationship is clear), cross-references in both directions, update `index_${REPO_NAME}.md`, append a `## [YYYY-MM-DD] verb | Subject` entry to `log_${REPO_NAME}.md`. Defer to `SCHEMA_${REPO_NAME}.md` for conventions; do not duplicate them into memory.
+For every write: frontmatter (`type:`, `up:`, typed edges like `extends:` / `supports:` / `criticizes:` when the relationship is clear), cross-references in both directions, update `index_${REPO_NAME}.md`, append a `## [YYYY-MM-DD] verb | Subject` entry to `log_${REPO_NAME}.md`. Defer to `wiki/agents/memory-architecture.md` for conventions; do not duplicate them into memory.
 
 Honest reporting: bad results, contradicted claims, and worsened metrics get filed truthfully. Per the project's CLAUDE.md and global instructions, never report accuracy from projections, only from real script outputs. The canonical "Universal Rationalizations (Always Wrong)" list — the rationalizations that lead to dishonest writes — lives at `wiki/agents/discipline-gates.md`. Before committing any wiki write, run the Verification Gate procedure at `wiki/agents/verification-gate.md`.
 

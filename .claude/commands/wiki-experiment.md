@@ -4,7 +4,7 @@ description: File experiment results to the wiki (Ingest procedure from SCHEMA).
 
 You are filing an experiment result to the wiki as durable project memory.
 
-Full procedure: see `.claude/skills/wiki-experiment.md` and `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md`. Summary:
+Full procedure: see `.claude/skills/wiki-experiment.md` and `wiki/agents/memory-architecture.md`. Summary:
 
 1. Identify the experiment from the conversation or ask the user: which variant ran, configuration (parameters, seeds, dataset, scale, restart probability, type weights, softmax temperatures), headline metrics (per hop count for MuSiQue), what changed vs. the previous run, what was surprising, and the path to the experiment's `results/` directory.
 2. Read existing wiki pages first (benchmark page, headline results page, comparison pages, concept pages whose claims this result bears on). Integrate, do not duplicate.
@@ -13,7 +13,7 @@ Full procedure: see `.claude/skills/wiki-experiment.md` and `wiki/onto-wiki.wiki
 5. Update concept pages whose claims this result bears on. If a result contradicts a wiki claim, update or flag the affected page.
 6. Fix cross-references in both directions on every affected page.
 7. Update `index_onto-wiki.md` with one-line descriptions of new pages.
-8. Append a `## [YYYY-MM-DD] update | Experiment name` entry to `log_onto-wiki.md`. The first bullet is the attribution line `- by: <name> via claude-code`, where `<name>` is the output of `git config user.name` in the wiki repo (read it, do not invent it). Then 2 to 5 bullets describing the run. See "Log Entry Attribution" in `SCHEMA_onto-wiki.md`.
+8. Append a `## [YYYY-MM-DD] update | Experiment name` entry to `log_onto-wiki.md`. The first bullet is the attribution line `- by: <name> via claude-code`, where `<name>` is the output of `git config user.name` in the wiki repo (read it, do not invent it). Then 2 to 5 bullets describing the run. See "Log Entry Attribution" in `wiki/agents/memory-architecture.md`.
 9. Optionally rebuild the knowledge graph: `./scripts/kg/build-graph.sh`.
 10. **Run the Verification Gate** at `wiki/agents/verification-gate.md` over every page created or edited. Do not commit until all criteria pass. It catches projection-as-fact, missing corpus tags on numerical claims, missing back-references, and missing log/index entries.
 11. **Finish the cycle.** Commit in the wiki's own git repo in two steps, without asking. One commit per log entry keeps `git blame` on the log a faithful per-entry record (see "Log Entry Attribution" in SCHEMA):

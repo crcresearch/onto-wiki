@@ -43,7 +43,7 @@ This project maintains a **persistent wiki** at `wiki/onto-wiki.wiki/` (separate
 Three files at the repo root define how the wiki works. Read them in this order before doing non-trivial wiki work:
 
 1. `llm-wiki.md` -- the underlying pattern. Explains *why* the wiki exists as a compounding artifact rather than as RAG over raw sources, and lays out the three-layer architecture (raw sources, wiki, schema) and the three operations (ingest, query, lint). Read this for context on judgment calls.
-2. `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md` -- the authoritative conventions reference: page format, frontmatter (required `type:` and `up:`, optional typed edges like `extends:` / `supports:` / `criticizes:`), naming, cross-reference styles (`[[Page-Name]]` in frontmatter, `[Display](Page-Name)` in body), special files, and full operation procedures. Defer to this file when in doubt; do not duplicate its rules into this CLAUDE.md.
+2. `wiki/agents/memory-architecture.md` -- the authoritative conventions reference: page format, frontmatter (required `type:` and `up:`, optional typed edges like `extends:` / `supports:` / `criticizes:`), naming, cross-reference styles (`[[Page-Name]]` in frontmatter, `[Display](Page-Name)` in body), special files, and full operation procedures. Defer to this file when in doubt; do not duplicate its rules into this CLAUDE.md.
 3. `wiki/init-wiki.sh` -- the bootstrap and update tool. **Execute this script; do not reimplement what it does manually.** It is idempotent and auto-detects create vs. update mode: on a fresh repo it scaffolds the wiki and namespaced navigation files; on an existing wiki it patches SCHEMA and this CLAUDE.md to bring them up to current conventions.
 
 The three operations the LLM performs against the wiki:
@@ -68,7 +68,7 @@ When a fact emerges and the destination is unclear, ask: does it follow the user
 The wiki is this project's durable memory. Read it to recall context; write to it to remember. Apply this rule in both directions, proactively, without waiting to be asked.
 
 - **Read** the wiki when context about the project would help an answer: start at `index_onto-wiki.md`, then drill into named pages. Cite page names when synthesizing answers. If a wiki claim conflicts with current code or results, trust what is observed now and flag the stale page rather than repeating it.
-- **Write** to the wiki whenever significant work produces something that a future session would benefit from knowing: experiment results, decisions with stated reasons, reusable syntheses, contradictions of prior claims. Follow the Ingest procedure in `SCHEMA_onto-wiki.md`.
+- **Write** to the wiki whenever significant work produces something that a future session would benefit from knowing: experiment results, decisions with stated reasons, reusable syntheses, contradictions of prior claims. Follow the Ingest procedure in `wiki/agents/memory-architecture.md`.
 
 **Finish the cycle: every wiki edit ends with a commit.** The wiki at `wiki/onto-wiki.wiki/` is a separate git repo with its own remote. Before committing, **run the Verification Gate** at `wiki/agents/verification-gate.md` over every page created or edited, which catches projection-as-fact, missing corpus tags on numerical claims, missing back-references, and missing log/index entries. Then:
 

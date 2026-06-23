@@ -4,7 +4,7 @@ description: Ingest a new source document (paper, article, design doc) into the 
 
 You are ingesting a new external source document (paper, article, design doc, README, external reference) into the wiki. This is the llm-wiki-style Ingest. It is NOT for filing experiment results — for experiment results, use `/wiki-experiment` instead.
 
-Full procedure: see `.claude/skills/wiki-source.md` and `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md`. Summary:
+Full procedure: see `.claude/skills/wiki-source.md` and `wiki/agents/memory-architecture.md`. Summary:
 
 1. Read the source. If long, ask the user which sections matter most for this project.
 2. Discuss key takeaways with the user briefly before writing pages. Confirm framing and cross-link targets.
@@ -13,7 +13,7 @@ Full procedure: see `.claude/skills/wiki-source.md` and `wiki/onto-wiki.wiki/SCH
 5. Update related entity and concept pages so the new source reinforces or revises what they say. If contradiction, update or flag the affected page.
 6. Fix cross-references in both directions on every affected page.
 7. Update `index_onto-wiki.md` under "Source summaries".
-8. Append a `## [YYYY-MM-DD] ingest | Source title` entry to `log_onto-wiki.md`. The first bullet is the attribution line `- by: <name> via claude-code`, where `<name>` is the output of `git config user.name` in the wiki repo (read it, do not invent it). Then 2 to 5 bullets describing the ingest. See "Log Entry Attribution" in `SCHEMA_onto-wiki.md`.
+8. Append a `## [YYYY-MM-DD] ingest | Source title` entry to `log_onto-wiki.md`. The first bullet is the attribution line `- by: <name> via claude-code`, where `<name>` is the output of `git config user.name` in the wiki repo (read it, do not invent it). Then 2 to 5 bullets describing the ingest. See "Log Entry Attribution" in `wiki/agents/memory-architecture.md`.
 9. Optionally rebuild the knowledge graph: `./scripts/kg/build-graph.sh`.
 10. **Run the Verification Gate** at `wiki/agents/verification-gate.md` over every page created or edited. Do not commit until all criteria pass. It catches projection-as-fact, missing corpus tags, missing back-references, and missing log/index entries.
 11. **Finish the cycle.** Commit in the wiki's own git repo in two steps, without asking. One commit per log entry keeps `git blame` on the log a faithful per-entry record (see "Log Entry Attribution" in SCHEMA):

@@ -25,7 +25,7 @@ When a fact emerges and the destination is unclear, ask: does it follow the user
 The wiki is this project's durable memory. Read it to recall context; write to it to remember. Apply this rule in both directions, proactively, without waiting to be asked.
 
 - **Read** the wiki when context about the research would help an answer: start at `index_${REPO_NAME}.md`, then drill into named pages. Cite page names when synthesizing answers. If a wiki claim conflicts with current code or results, trust what is observed now and flag the stale page rather than repeating it.
-- **Write** to the wiki whenever significant work produces something that a future session would benefit from knowing: experiment results (configuration, metrics per hop count where applicable, what changed, what was surprising), decisions with stated reasons, reusable syntheses, contradictions of prior claims. Follow the Ingest procedure in `SCHEMA_${REPO_NAME}.md`.
+- **Write** to the wiki whenever significant work produces something that a future session would benefit from knowing: experiment results (configuration, metrics per hop count where applicable, what changed, what was surprising), decisions with stated reasons, reusable syntheses, contradictions of prior claims. Follow the Ingest procedure in `wiki/agents/memory-architecture.md`.
 
 **Finish the cycle: every wiki edit ends with a commit.** The wiki at `wiki/${REPO_NAME}.wiki/` is a separate git repo with its own remote. Before committing, **run the Verification Gate** at `wiki/agents/verification-gate.md` over every page created or edited — it catches projection-as-fact, missing corpus tags on numerical claims, missing back-references, and missing log/index entries. Then:
 

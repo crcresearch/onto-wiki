@@ -36,7 +36,7 @@ cat <<'EOF'
 <system-reminder>
 This project uses the wiki at wiki/${REPO_NAME}.wiki/ as durable memory.
 It is a separate git repository with its own remote, NOT a subdirectory of
-the main repo. Read SCHEMA_${REPO_NAME}.md before non-trivial wiki edits.
+the main repo. Read wiki/agents/memory-architecture.md before non-trivial wiki edits.
 Update the wiki proactively when experiment results, decisions, or
 syntheses emerge.
 

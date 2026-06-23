@@ -103,6 +103,24 @@ pipeline or system component relationship). Inverse: `informedBy`.
 Distinct from `supports` (evidence for a claim) and `dependsOn`
 (architectural prerequisite).
 
+## usesTool
+
+Reaches for this tool/framework to instantiate or test the operation
+on this page. Inverse: `usedBy`. The target is a tool page; expect a
+runnable way to actually do the thing.
+
+## reuses
+
+Leverages this existing ontology/vocabulary rather than reinventing
+it. Inverse: `reusedBy`. The target is a reusable ontology/material
+page; prefer it over modeling from scratch.
+
+## governedBy
+
+This page's subject is constrained by the target standard or SHACL
+shape — the rules it must satisfy. Inverse: `governs`. The target is a
+standard or shape page.
+
 ## related
 
 Fallback lateral connection when none of the above fits. Prefer

@@ -21,7 +21,7 @@ This is the Ingest operation. It is **not** for filing our own experiment result
 
 ## Procedure
 
-Follow the source-first Ingest in `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md`. Steps:
+Follow the source-first Ingest in `wiki/agents/memory-architecture.md`. Steps:
 
 1. **Acquire & decide path.** Locate the source; choose **HTML-first** (arXiv HTML → `pandoc -t gfm`, deterministic and faithful) or **PDF fallback** (Paperpile PDF at `~/Library/CloudStorage/GoogleDrive-…/My Drive/Paperpile/` or the vault mirror → OCR/converter; install Python tools via `uv`). **CHECKPOINT 1 — confirm the source and acquisition path with the user before fetching.**
 2. **Convert → `sources/<slug>.md`.** Deterministic conversion (not an LLM paraphrase). Provenance header: `type: source-text`, `title`, `authors`, `year`, ids (`arxiv`/`doi`), `source_url`, `html_source`, `retrieved`, `conversion`, `figures_reviewed`. Add a "Primary source — verbatim; do not edit" notice. Language-tag code fences (`sparql`, `turtle`) by content; leave pseudo-notation/prompts plain.
