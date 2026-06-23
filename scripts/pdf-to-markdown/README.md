@@ -24,6 +24,15 @@ Docling's text layer, so this is a deliberate alternative, not the default.
 > DeepSeek-OCR's custom processor. Do not pass `trust_remote_code=True` — it forces the broken
 > transformers path. On first use transformers prints a one-time "run custom code?" prompt; it
 > auto-proceeds in non-interactive runs (answer `y` if running by hand).
+>
+> **KNOWN LIMITATION (verified 2026-06-23):** the mlx-vlm port catastrophically *repeats/loops*
+> ("1. 2. 3. …", "the image is a 2D image …") on **dense / complex pages** (e.g. two-column ACM
+> papers with code listings). This affects **both v1 (`DeepSeek-OCR-8bit`) and v2** and is *not*
+> fixed by prompt, `max_tokens`, or `cropping`/`min_patches`/`max_patches`. It is the mlx-vlm
+> integration's documented failure mode (Blaizzy/mlx-vlm #549, #1437), not the model — the real
+> DeepSeek-OCR via vLLM/transformers (CUDA) does not have this. **On this Mac, treat deepseek-mlx
+> as reliable only for simpler pages; for born-digital use pymupdf4llm, for layout/figures use
+> docling.**
 
 ## Run
 

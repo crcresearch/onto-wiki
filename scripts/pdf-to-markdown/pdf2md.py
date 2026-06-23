@@ -125,10 +125,9 @@ def convert_deepseek_mlx(pdf, assets, slug, scale, min_size, model_id):
     # "run custom code?" prompt; it auto-proceeds in non-interactive runs.)
     model, processor = load(model_id)
     cfg = load_config(model_id)
-    # Tested-good DeepSeek-OCR prompt (from techindex-exp): the space after the token,
-    # "this document page", and "preserving detection tags" all matter — the model is
-    # prompt-finicky and drifting from this string invites runaway/looping output.
-    PROMPT = "<|grounding|> Convert this document page to Markdown, preserving detection tags."
+    # Official DeepSeek-OCR structured-output prompt. Custom variants are unsupported and
+    # can trigger garbage; the grounding token still yields <|ref|>/<|det|> bboxes for figures.
+    PROMPT = "<|grounding|>Convert the document to markdown."
 
     n = 0
     body = []
@@ -136,7 +135,10 @@ def convert_deepseek_mlx(pdf, assets, slug, scale, min_size, model_id):
         tmp = assets / f"_page_{i:03d}.png"
         pil.save(tmp)
         formatted = apply_chat_template(processor, cfg, PROMPT, num_images=1)
-        out = generate(model, processor, formatted, [str(tmp)], temp=0.0, max_tokens=4096, verbose=False)
+        # cropping/min_patches/max_patches = DeepSeek-OCR-2 dynamic resolution (mlx-vlm README).
+        # WITHOUT these the default resolution mishandles dense pages -> catastrophic repetition loop.
+        out = generate(model, processor, formatted, [str(tmp)], temp=0.0, max_tokens=4096,
+                       verbose=False, cropping=True, min_patches=1, max_patches=6)
         text = getattr(out, "text", str(out))
         W, H = pil.size
 
