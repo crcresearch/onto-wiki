@@ -23,7 +23,10 @@ This is the Ingest operation. It is **not** for filing our own experiment result
 
 Follow the source-first Ingest in `wiki/agents/memory-architecture.md`. Steps:
 
-1. **Acquire & decide path.** Locate the source; choose **HTML-first** (arXiv HTML → `pandoc -t gfm`, deterministic and faithful) or **PDF fallback** (Paperpile PDF at `~/Library/CloudStorage/GoogleDrive-…/My Drive/Paperpile/` or the vault mirror → OCR/converter; install Python tools via `uv`). **CHECKPOINT 1 — confirm the source and acquisition path with the user before fetching.**
+1. **Acquire & decide path.** Locate the source; choose **HTML-first** (arXiv HTML → `pandoc -t gfm`, deterministic and faithful) or **PDF** (Paperpile PDF at `~/Library/CloudStorage/GoogleDrive-…/My Drive/Paperpile/` or the vault mirror). **CHECKPOINT 1 — confirm the source and acquisition path with the user before fetching.**
+
+   - **PDF path → delegate steps 2–4 to the `/pdf-ingest` skill** (it runs `pdf2md` + the OCR sanity-check and returns a trustworthy `source-text`). Resume here at step 5.
+   - **HTML path → do steps 2–4 inline** as below.
 2. **Convert → `sources/<slug>.md`.** Deterministic conversion (not an LLM paraphrase). Provenance header: `type: source-text`, `title`, `authors`, `year`, ids (`arxiv`/`doi`), `source_url`, `html_source`, `retrieved`, `conversion`, `figures_reviewed`. Add a "Primary source — verbatim; do not edit" notice. Language-tag code fences (`sparql`, `turtle`) by content; leave pseudo-notation/prompts plain.
 3. **Pull figures → `sources/assets/<slug>/`**, rewrite image links to local relative paths, keep captions.
 4. **Figure-resolution review.** *View* each figure; judge legibility. If any fail, escalate in-loop (arXiv e-print vector tarball / higher-DPI / OCR re-extract). Record the verdict in `figures_reviewed:`.

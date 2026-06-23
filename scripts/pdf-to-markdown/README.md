@@ -4,27 +4,42 @@ Converts a PDF to a faithful `source-text` markdown page plus extracted figures,
 source-first ingest pipeline (see `wiki/agents/memory-architecture.md`). Operating-system-layer
 tooling; it produces *ground truth*, it does not interpret.
 
-## Pathway
+## Engines
 
-- **Primary — born-digital (default):** Docling parses the embedded text layer (`do_ocr=False`).
-  Faithful and fast for digital PDFs (academic papers); ~30 s for a 30-page paper, no GPU, no model
-  downloads beyond Docling's layout models. This is the validated path.
-- **Fallback — scanned/image PDFs:** pass `--ocr-engine <name>` to turn on OCR. Engines registered in
-  this install: `auto, easyocr, ocrmac, rapidocr, tesseract, tesserocr, nemotron-ocr, kserve_v2_ocr`.
-  On macOS, **`ocrmac`** (Apple Vision, local, no download) is the pragmatic choice. The VLM engines
-  (`deepseek_ocr`, `glm_ocr`, `dots_ocr`) require an extra Docling plugin not installed by default.
+**`--engine docling` (default) — born-digital.** Parses the embedded text layer (`do_ocr=False`).
+Faithful and fast for digital PDFs (academic papers); ~30 s for a 30-page paper, no GPU, no model
+downloads beyond Docling's layout models. This is the validated default. For *scanned* PDFs pass
+`--ocr-engine ocrmac` (Apple Vision, local, no download). The Docling VLM OCR engines
+(`deepseek_ocr`, `glm_ocr`, `dots_ocr`) require an extra Docling plugin not installed by default —
+on macOS, prefer the dedicated `deepseek-mlx` engine below instead.
+
+**`--engine deepseek-mlx` — DeepSeek-OCR-2 on Apple Silicon.** Vision OCR with grounding, run
+locally via `mlx-vlm` (`mlx-community/DeepSeek-OCR-2-8bit`, ~1–2 GB on first run). Figures come from
+the model's detection bounding boxes. Use for scanned docs, or to compare figure extraction with
+Docling — on slide decks it tends to read titles as text and extract only real figures, where the
+Docling layout parser crops every slide. Born-digital prose is still more faithfully captured by
+Docling's text layer, so this is a deliberate alternative, not the default.
+
+> **mlx-vlm is pinned to `0.3.10`** (in the script's deps). Newer mlx-vlm fails to load
+> DeepSeek-OCR's custom processor. Do not pass `trust_remote_code=True` — it forces the broken
+> transformers path. On first use transformers prints a one-time "run custom code?" prompt; it
+> auto-proceeds in non-interactive runs (answer `y` if running by hand).
 
 ## Run
 
 ```bash
+# born-digital (default)
 uv run scripts/pdf-to-markdown/pdf2md.py <pdf> \
   --slug Author-Year-Slug --out <wiki>/sources \
   --title "..." --authors "A; B; C" --year 2022 \
   --doi "..." --arxiv "..." --source-url "..."
-# scanned fallback:  --ocr-engine ocrmac
+
+# scanned (Docling + Apple Vision):   --ocr-engine ocrmac
+# DeepSeek-OCR-2 on Apple Silicon:    --engine deepseek-mlx
+# drop icon/fragment figures:         --min-figure-size 200   (default)
 ```
 
-`uv` resolves Docling from the inline PEP 723 header on first run.
+`uv` resolves dependencies from the inline PEP 723 header on first run.
 
 ## Output
 
