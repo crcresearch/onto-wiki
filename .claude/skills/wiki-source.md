@@ -1,51 +1,48 @@
 ---
 name: wiki-source
-description: Ingest a new source document (paper, article, design doc, README, external reference) into the wiki. Creates a source-summary page and links it into the existing wiki neighborhood.
+description: Ingest a new source into the wiki, source-first. Builds a faithful verbatim sources/ rendering (with local figures, resolution-reviewed) as ground truth, then writes a synthesis page that grounds down into it. Two human checkpoints.
 ---
 
-A new external source has entered the project. Read it, extract what is durable, and integrate it into the wiki so the source's content becomes part of the project's compounding memory.
+A new external source has entered the project. The goal is **durable, grounded memory**: a faithful local copy of the primary material plus a synthesis that can always be checked against it. This wiki is opinionated and source-first — build the verbatim source *before* the synthesis, so the synthesis is written from local ground truth, not transient web-reading.
 
 ## What is "a source"
 
-- A research paper, article, or technical report
-- A design document or position paper (often under `docs/`)
-- An external README, blog post, or specification
-- A reference URL or PDF that the user wants to keep
+- A research paper, article, technical report, or thesis chapter
+- A design document or position paper
+- An external README, blog post, or specification the user wants to keep
 
-This is the `llm-wiki.md`-style Ingest. It is **not** for filing our own experiment results. For experiment results, use `/wiki-experiment` instead.
+This is the Ingest operation. It is **not** for filing our own experiment results — use `/wiki-experiment` for those.
 
 ## What to capture
 
-- Title, author(s), publication or source
-- The one-sentence claim or contribution
-- The specific arguments, methods, or findings that bear on this project
-- Where the source agrees with, extends, or contradicts existing wiki claims
-- Quotes worth keeping verbatim (cite location)
+- **The verbatim primary text** → `sources/<Author-Year-Slug>.md` (`type: source-text`), with stable section anchors and a provenance header. The body is faithful and **never edited**.
+- **The figures** → `sources/assets/<Author-Year-Slug>/`, captions preserved, *resolution-reviewed*.
+- **The synthesis** → a `source-summary` page (our reading) that grounds down into the verbatim text by section anchor and figure path.
 
 ## Procedure
 
-Follow the Ingest procedure in `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md`. Pointers:
+Follow the source-first Ingest in `wiki/onto-wiki.wiki/SCHEMA_onto-wiki.md`. Steps:
 
-1. Read the source. If long, ask the user which sections matter most for this project.
-2. Discuss the key takeaways with the user briefly before writing pages. Confirm the framing and the cross-link targets.
-3. Create a source-summary page named after the source (e.g., `Karpathy-Memex-Gist.md`, `Vannevar-Bush-Memex-1945.md`). Frontmatter: `type: source-summary`, `up:` to the closest existing parent page (often the home page or a concept page that the source extends), and `source:` set to a URL or filesystem path. Add `supports:` / `criticizes:` / `extends:` typed edges to other wiki pages where the relationship is clear.
-4. Page body: one-sentence opening line stating what the source is and what it contributes. Then sections for: contribution, methods or arguments relevant here, where it intersects with this project, quotes worth keeping, link to the source. Concise reference style.
-5. Update related entity and concept pages so the new source reinforces or revises what they say. If the source contradicts a wiki claim, update or flag the affected page, do not leave the contradiction.
-6. Fix cross-references in both directions on every affected page (`[[Page]]` in frontmatter, `[Display](Page)` in body).
-7. Update `index_onto-wiki.md` under the "Source summaries" category.
-8. Append a `## [YYYY-MM-DD] ingest | Source title` entry to `log_onto-wiki.md`. The first bullet is the attribution line `- by: <name> via claude-code`, where `<name>` is the output of `git config user.name` in the wiki repo (read it, do not invent it). Then 2 to 5 bullets describing the ingest. See "Log Entry Attribution" in `SCHEMA_onto-wiki.md`.
-9. Optionally rebuild the knowledge graph: `./scripts/kg/build-graph.sh`.
-10. **Run the Verification Gate** at `wiki/agents/verification-gate.md` over every page created or edited. Do not commit until all criteria pass. The gate catches projection-as-fact, missing corpus tags, missing back-references, and missing log/index entries.
-11. Commit in the wiki's own git repo in two steps: first stage and commit the page and index changes by name with a descriptive message, then stage and commit the `log_onto-wiki.md` entry on its own. One commit per log entry keeps `git blame` on the log a faithful per-entry record (see "Log Entry Attribution" in SCHEMA). Do not push unless the user requests. **When pushing, follow the procedure at `wiki/agents/wiki-write-protocol.md`** rather than plain `git push`.
+1. **Acquire & decide path.** Locate the source; choose **HTML-first** (arXiv HTML → `pandoc -t gfm`, deterministic and faithful) or **PDF fallback** (Paperpile PDF at `~/Library/CloudStorage/GoogleDrive-…/My Drive/Paperpile/` or the vault mirror → OCR/converter; install Python tools via `uv`). **CHECKPOINT 1 — confirm the source and acquisition path with the user before fetching.**
+2. **Convert → `sources/<slug>.md`.** Deterministic conversion (not an LLM paraphrase). Provenance header: `type: source-text`, `title`, `authors`, `year`, ids (`arxiv`/`doi`), `source_url`, `html_source`, `retrieved`, `conversion`, `figures_reviewed`. Add a "Primary source — verbatim; do not edit" notice. Language-tag code fences (`sparql`, `turtle`) by content; leave pseudo-notation/prompts plain.
+3. **Pull figures → `sources/assets/<slug>/`**, rewrite image links to local relative paths, keep captions.
+4. **Figure-resolution review.** *View* each figure; judge legibility. If any fail, escalate in-loop (arXiv e-print vector tarball / higher-DPI / OCR re-extract). Record the verdict in `figures_reviewed:`.
+5. **Read the verbatim text + figures; discuss framing.** **CHECKPOINT 2 — get the user's approval of the framing and cross-link targets before writing the synthesis.**
+6. **Write the synthesis** (`source-summary`). Frontmatter: `up:` to the closest parent, `source:` to the canonical URL, `concept:`/`supports:`/`criticizes:` where clear. Body: opening line, contribution, methods/results relevant here, why-it's-here, and a **Primary source (verbatim, for grounding)** section pointing to `sources/<slug>.md#section` and figure paths. Where the source's framing is dated (e.g. pre-agentic), add an expertise-layer dating caveat.
+7. **Verification gate.** Run `wiki/agents/verification-gate.md` over every page; check each synthesis claim **against the local verbatim text**, not memory. Do not commit until it passes.
+8. **Wire in.** Fix cross-references both directions (`[[Page]]` frontmatter, `[Display](Page)` body); update `index_onto-wiki.md` under "Source summaries"; link the source from any [Operations](Operations) playbook that now `source:`s it.
+9. **Append the log** entry `## [YYYY-MM-DD] ingest | Source title` to `log_onto-wiki.md`; first bullet `- by: <git config user.name> via claude-code` (read it, do not invent).
+10. **Commit in three units** (wiki repo): (1) verbatim source + assets, (2) synthesis + index + cross-refs, (3) the log entry on its own. Do not push unless asked; when pushing, follow `wiki/agents/wiki-write-protocol.md`.
+11. Optionally rebuild the KG: `./scripts/kg/build-graph.sh`.
 
 A typical source ingest touches 5 to 15 pages.
 
 ## When to skip
 
-- The source is too short or off-topic to justify a page. (A one-line entry in another existing page may be enough.)
-- The source duplicates content already covered by an existing wiki page. (Update that page instead of creating a new one.)
-- The user has not actually asked for the source to enter the project's memory.
+- Too short or off-topic to justify a source-text page (a line in an existing page may do).
+- Duplicates an existing source (update that page instead).
+- The user has not actually asked for the source to enter memory.
 
 ## After running
 
-Tell the user which pages were created or updated, and which existing pages now link to the new source.
+Tell the user the verbatim source path, the figure-review verdict, the synthesis page, and which existing pages/playbooks now link to the new source.
