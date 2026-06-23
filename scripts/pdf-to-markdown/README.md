@@ -37,7 +37,10 @@ uv run scripts/pdf-to-markdown/pdf2md.py <pdf> \
 # scanned (Docling + Apple Vision):   --ocr-engine ocrmac
 # DeepSeek-OCR-2 on Apple Silicon:    --engine deepseek-mlx
 # drop icon/fragment figures:         --min-figure-size 200   (default)
+# collapse duplicated text layer:      --dedup
 ```
+
+`--dedup` collapses exact consecutive tandem repeats (word-level, line-local), for PDFs whose text layer is drawn 3–4× (Docling faithfully extracts the repeats). It is guarded to leave genuine short repeats intact. It does **not** catch *cross-line* duplication (copies split across separate lines) — rare, but when it happens the conversion needs manual review or a different engine.
 
 `uv` resolves dependencies from the inline PEP 723 header on first run.
 

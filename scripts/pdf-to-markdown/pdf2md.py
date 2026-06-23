@@ -38,6 +38,35 @@ def _norm2px(b, w, h):
     return (int(x1 / 1000 * w), int(y1 / 1000 * h), int(x2 / 1000 * w), int(y2 / 1000 * h))
 
 
+def _collapse_line(line, min_period=4):
+    """Collapse exact consecutive tandem repeats within a line (word-level).
+
+    Some PDFs have a text layer drawn 3-4x; Docling faithfully extracts the repeats,
+    so each paragraph/heading/code line becomes its base content repeated k times.
+    We collapse a repeat only when the period is substantial (>= min_period words) OR
+    it repeats >=3 times (catches short repeated headings), so genuine short natural
+    repeats ('the the' as reps=2, period<min) are left intact. Greedy, smallest-period.
+    """
+    toks = line.split()
+    n, out, i = len(toks), [], 0
+    while i < n:
+        found = False
+        for p in range(1, (n - i) // 2 + 1):
+            reps = 1
+            while toks[i + reps * p : i + (reps + 1) * p] == toks[i : i + p]:
+                reps += 1
+            if reps >= 2 and (p >= min_period or reps >= 3):
+                out.extend(toks[i : i + p]); i += reps * p; found = True; break
+        if not found:
+            out.append(toks[i]); i += 1
+    return " ".join(out)
+
+
+def dedup_body(md):
+    """Apply tandem-repeat collapse line-by-line (preserves blank lines / structure)."""
+    return "\n".join(_collapse_line(l) if l.strip() else l for l in md.split("\n"))
+
+
 # ---------- engine: docling (born-digital text layer) ----------
 def convert_docling(pdf, assets, slug, scale, min_size, ocr_engine):
     from docling.document_converter import DocumentConverter, PdfFormatOption
@@ -163,6 +192,8 @@ def main():
     p.add_argument("--scale", type=float, default=2.0)
     p.add_argument("--min-figure-size", type=int, default=200,
                    help="skip extracted figures whose smaller side is below this (px); drops icon/fragment noise")
+    p.add_argument("--dedup", action="store_true",
+                   help="collapse exact consecutive tandem repeats (for PDFs whose text layer is drawn 3-4x)")
     p.add_argument("--ocr-engine", default=None, help="docling engine only: turn on OCR (e.g. ocrmac on macOS)")
     p.add_argument("--model", default=DEEPSEEK_DEFAULT, help="deepseek-mlx model id")
     for fl in ("title", "authors", "arxiv", "doi", "source-url"):
@@ -182,6 +213,11 @@ def main():
         body, n = convert_deepseek_mlx(a.pdf, assets, a.slug, a.scale, a.min_figure_size, a.model)
     else:
         body, n = convert_docling(a.pdf, assets, a.slug, a.scale, a.min_figure_size, a.ocr_engine)
+
+    if a.dedup:
+        before = len(body.split())
+        body = dedup_body(body)
+        print(f"  dedup: {before} -> {len(body.split())} words", file=sys.stderr)
 
     out_md = a.out / f"{a.slug}.md"
     out_md.write_text(frontmatter(a, a.engine, a.ocr_engine, a.scale, n, a.model) + body, encoding="utf-8")
